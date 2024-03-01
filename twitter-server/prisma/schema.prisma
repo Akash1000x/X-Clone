@@ -22,4 +22,19 @@ model User{
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  tweets Tweet[]
+}
+
+
+model Tweet{
+  id String @id @default(cuid())
+  content String
+  imageURL String?
+  
+  author User @relation(fields: [authotId], references: [id])
+  authotId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
