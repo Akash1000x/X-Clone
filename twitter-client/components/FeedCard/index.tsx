@@ -38,6 +38,14 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
           </h5>
           <p className="text-justify opacity-95 font-[chirp-regular] text-sm font-thin">
             {data?.content}
+            {data?.imageURL && (
+                <Image
+                  src={data?.imageURL}
+                  alt="tweet-image"
+                  width={300}
+                  height={300}
+                />
+              )}
           </p>
 
           <div className="flex justify-between text-xl pt-3">
