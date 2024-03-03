@@ -97,7 +97,7 @@ export default function Home(props: HomeProps) {
   }, [content]);
 
   return (
-    <div className="font-[chirp-regular]">
+    <div className="font-[chirp-regular] box-border">
       <XLayout>
         <div>
           <div className="grid grid-cols-12 border-b-[1px] border-zinc-700 py-3 px-4 hover:bg-neutral-950 transition-all duration-150 ">

@@ -22,7 +22,7 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
             <Link href={`/${data?.author?.id}`}>
               <Image
                 className="rounded-full"
-                src={data.author?.profileImageURL}
+                src={data?.author?.profileImageURL}
                 alt="user-image"
                 width={50}
                 height={50}
