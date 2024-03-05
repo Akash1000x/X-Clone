@@ -102,17 +102,19 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
       <div className="grid grid-cols-12 h-screen w-screen overflow-y-scroll ">
         <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-10 lg:ml-12 pl-2 relative flex justify-end">
           <div>
-            <div className="text-[28px] hover:bg-zinc-900 cursor-pointer w-fit p-3 mb-1 rounded-full transition-all duration-75">
-              <BsTwitterX />
-            </div>
+            <Link href={"/"}>
+              <div className="text-[28px] hover:bg-zinc-900 cursor-pointer w-fit p-3 mb-1 rounded-full transition-all duration-75">
+                <BsTwitterX />
+              </div>
+            </Link>
             <div className="">
               <ul>
                 {SidebarMenuItems.map((item) => (
-                  <li
-                    
-                    key={item.title}
-                  >
-                    <Link href={item.link} className="flex font-[chirp-regular]  hover:bg-zinc-900 cursor-pointer w-fit rounded-full  pl-3 pr-3 lg:pr-7 py-3 transition-all duration-75">
+                  <li key={item.title}>
+                    <Link
+                      href={item.link}
+                      className="flex font-[chirp-regular]  hover:bg-zinc-900 cursor-pointer w-fit rounded-full  pl-3 pr-3 lg:pr-7 py-3 transition-all duration-75"
+                    >
                       <span className="text-3xl lg:pr-4">{item.icon}</span>
                       <span className="text-xl text-gray-200 hidden lg:inline">
                         {item.title}
@@ -139,7 +141,10 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
             </div>
           </div>
           {user && (
-            <div className="absolute bottom-5 flex gap-2 items-center hover:bg-zinc-900 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer">
+            <Link
+              href={`/${user?.id}`}
+              className="absolute bottom-5 flex gap-2 items-center hover:bg-zinc-900 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer"
+            >
               {user && user.profileImageURL && (
                 <Image
                   className="rounded-full "
@@ -156,7 +161,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
               <div className="text-2xl items-end pl-7 hidden lg:inline">
                 <TfiMoreAlt />
               </div>
-            </div>
+            </Link>
           )}
         </div>
         <div className="col-span-10 md:col-span-8 lg:col-span-5 border-l-[1px] border-r-[1px] border-zinc-700 ">
@@ -170,6 +175,36 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
               </h1>
               <GoogleLogin onSuccess={handleLoginWithGoogle} />
             </div>
+          )}
+
+          {user?.recommendedUser?.length ? (
+            <div className="p-3 bg-[#16181C] rounded-lg">
+              <h1 className="  text-2xl font-[chirp-heavy]">Who to follow</h1>
+              {user?.recommendedUser?.slice(0, 3).map((e) => (
+                <Link href={`/${e?.id}`}>
+                  <div
+                    key={e?.id}
+                    className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14"
+                  >
+                    {e?.profileImageURL && (
+                      <Image
+                        className="rounded-full "
+                        src={e?.profileImageURL}
+                        alt="user-image"
+                        width={50}
+                        height={50}
+                      />
+                    )}
+                    <div className="font-[chirp-heavy] ">
+                      <span>{e?.firstName}</span>
+                      <span> {e?.lastName}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <></>
           )}
         </div>
       </div>

@@ -12,6 +12,7 @@ import { getUserByIdQuery } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 interface ServerProps {
   userInfo?: User;
@@ -52,9 +53,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     <div>
       <XLayout>
         <div className="flex p-2 gap-5">
-          <nav className=" p-2 hover:bg-zinc-900 cursor-pointer rounded-full w-fit h-fit">
+          <Link href={"/"} className=" p-2 hover:bg-zinc-900 cursor-pointer rounded-full w-fit h-fit">
             <GoArrowLeft className="text-2xl " />
-          </nav>
+          </Link>
           <div>
             <h1 className="text-xl font-bold">
               {props?.userInfo?.firstName} {props?.userInfo?.lastName}
@@ -64,20 +65,29 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             </h1>
           </div>
         </div>
-        <div className="p-4 border-b-[1px] border-zinc-700">
+        <div className="py-4 border-b-[1px] border-zinc-700">
           {props?.userInfo?.profileImageURL && (
-            <Image
-              className="rounded-full"
+            <div className="relative">
+              <Image
+              className="w-full h-40 "
+              src="https://akash-x-dev.s3.ap-south-1.amazonaws.com/x_default_faults/x_profile_default_banner.png"
+              alt="user-image"
+              width={600}
+              height={50}
+            />
+              <Image
+              className="rounded-full absolute top-24 left-7 box-content border-4 border-black"
               src={props?.userInfo?.profileImageURL}
               alt="user-image"
               width={120}
               height={120}
             />
+            </div>
           )}
-          <h1>
+          <h1 className="text-xl font-bold mt-20 px-4">
             {props?.userInfo?.firstName} {props?.userInfo?.lastName}
           </h1>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center px-4">
             <div className="flex gap-4 mt-4">
               <span className="font-semibold hover:border-b cursor-pointer leading-none">
                 {props?.userInfo?.following?.length ?? 0}

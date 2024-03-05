@@ -40,6 +40,7 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
             {data?.content}
             {data?.imageURL && (
                 <Image
+                className="rounded-2xl mt-2 border-[1px] border-zinc-700 w-auto h-auto"
                   src={data?.imageURL}
                   alt="tweet-image"
                   width={300}
