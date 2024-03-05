@@ -2,6 +2,8 @@ import { prismaClient } from "../../clients/db";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import UserService from "../../services/user";
+import { redisClient } from "../../clients/redis";
+import TweetService from "../../services/tweet";
 
 const queries = {
   verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
@@ -23,13 +25,11 @@ const queries = {
     ctx: GraphqlContext
   ) => UserService.getUserById(id),
 };
+
 const extraResolvers = {
   User: {
-    tweets: (parent: User) => {
-      return prismaClient.tweet.findMany({
-        where: { author: { id: parent.id } },
-        orderBy: { createdAt: "desc" },
-      });
+    tweets:async (parent: User) => {
+      return await TweetService.getUserTweets(parent.id);
     },
     followers: async (parent: User) => {
       const result = await prismaClient.follows.findMany({
@@ -49,7 +49,13 @@ const extraResolvers = {
       });
       return result.map((el) => el.following);
     },
+
     recommendedUser: async (parent: User) => {
+      const cachedValue = await redisClient.get(
+        `RECOMMENDED_USERS:${parent.id}`
+      );
+      if (cachedValue) return JSON.parse(cachedValue);
+
       const myFollowings = await prismaClient.follows.findMany({
         where: { followerId: parent.id },
         include: {
@@ -59,23 +65,38 @@ const extraResolvers = {
         },
       });
 
-      const recommendedUsers:User[] = []
+      const recommendedUsers: User[] = [];
 
-      
-      for(const followings of myFollowings){
-        for(const followingOfFollowedUser of followings.following.followers){
-          
-          if(myFollowings.findIndex((el) => el.followingId === followingOfFollowedUser.following.id) < 0 ){
+      for (const followings of myFollowings) {
+        for (const followingOfFollowedUser of followings.following.followers) {
+          if (
+            myFollowings.findIndex(
+              (el) => el.followingId === followingOfFollowedUser.following.id
+            ) < 0
+          ) {
             recommendedUsers.push(followingOfFollowedUser.following);
           }
         }
       }
-      
-      if(recommendedUsers.length <= 0){
-        const data = await prismaClient.user.findMany({orderBy:{createdAt:"asc"}});
-        data.map((e) => recommendedUsers.push(e));
+
+      //if the user is not following anyone
+      if (recommendedUsers.length <= 0) {
+        const data = await prismaClient.user.findMany({
+          orderBy: { createdAt: "asc" },
+        });
+
+        for (const followings of myFollowings) {
+          if (followings.followerId !== parent.id) {
+            recommendedUsers.push(followings.following);
+          }
+        }
       }
-     
+
+      await redisClient.set(
+        `RECOMMENDED_USERS:${parent.id}`,
+        JSON.stringify(recommendedUsers)
+      );
+
       return recommendedUsers;
     },
   },
@@ -90,6 +111,7 @@ const mutations = {
     if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
 
     await UserService.followUser(ctx.user.id, to);
+    await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
     return true;
   },
 
@@ -100,6 +122,7 @@ const mutations = {
   ) => {
     if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
     await UserService.unFollowUser(ctx.user.id, to);
+    await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
     return true;
   },
 };
