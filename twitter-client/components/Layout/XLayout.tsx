@@ -181,9 +181,9 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
             <div className="p-3 bg-[#16181C] rounded-lg">
               <h1 className="  text-2xl font-[chirp-heavy]">Who to follow</h1>
               {user?.recommendedUser?.slice(0, 3).map((e) => (
-                <Link href={`/${e?.id}`}>
+                <Link href={`/${e?.id}`} key={e?.id}>
                   <div
-                    key={e?.id}
+                    
                     className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14"
                   >
                     {e?.profileImageURL && (
