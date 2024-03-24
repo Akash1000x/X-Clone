@@ -2,13 +2,13 @@ import Image from "next/image";
 
 import { Inter } from "next/font/google";
 
-import FeedCard from "@/Components/FeedCard";
+import FeedCard from "@/components/FeedCard";
 import { useCallback, useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/user";
 import { RiImage2Line } from "react-icons/ri";
 import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
 import { Tweet } from "@/gql/graphql";
-import XLayout from "@/Components/Layout/XLayout";
+import XLayout from "@/components/Layout/XLayout";
 import {
   GetAllTweetsQuery,
   getSignedURLForTweetQuery,

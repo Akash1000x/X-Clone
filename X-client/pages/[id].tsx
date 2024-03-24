@@ -2,10 +2,10 @@ import React, { useCallback, useMemo } from "react";
 
 import Image from "next/image";
 
-import XLayout from "@/Components/Layout/XLayout";
+import XLayout from "@/components/Layout/XLayout";
 import type { GetServerSideProps, NextPage } from "next";
 import { GoArrowLeft } from "react-icons/go";
-import FeedCard from "@/Components/FeedCard";
+import FeedCard from "@/components/FeedCard";
 import { Tweet, User } from "@/gql/graphql";
 import { graphqlClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
