@@ -56,7 +56,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
       to: props?.userInfo?.id,
     });
     setfollowingTheUser(false);
-  }, [props?.userInfo?.id, queryClient]);
+  }, [props?.userInfo?.id]);
 
   return (
     <div>

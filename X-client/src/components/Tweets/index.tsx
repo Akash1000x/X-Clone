@@ -70,7 +70,7 @@ const Home: React.FC<HomeProps> = (props) => {
     mutate({ content, imageURL });
     setContent("");
     setImageURL("");
-  }, [content, imageURL]);
+  }, [content, imageURL,mutate]);
 
   const rows = content.split("\n").length;
 
