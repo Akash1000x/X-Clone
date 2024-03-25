@@ -1,3 +1,4 @@
+
 import { graphql } from "@/gql";
 
 export const followUserMutation = graphql(`

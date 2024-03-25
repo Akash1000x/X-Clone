@@ -1,3 +1,4 @@
+
 import { graphql } from "@/gql";
 
 export const GetAllTweetsQuery = graphql(`

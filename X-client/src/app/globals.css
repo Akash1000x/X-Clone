@@ -32,17 +32,18 @@ body {
   }
 }
 
+
 @font-face {
   font-family: chirp-regular;
-  src: url(../public/Fonts/Chirp-Regular.80fda27a.ttf);
+  src: url(../../public/Fonts/Chirp-Regular.80fda27a.ttf);
 }
 
 @font-face {
   font-family: chirp-heavy;
-  src: url(../public/Fonts/Chirp-Heavy.f44ae4ea.ttf);
+  src: url(../../public/Fonts/Chirp-Heavy.f44ae4ea.ttf);
 }
 
 @font-face {
   font-family: chirp-bold;
-  src: url(../public/Fonts/Chirp-Bold.ebb56aba.ttf);
+  src: url(../../public/Fonts/Chirp-Bold.ebb56aba.ttf);
 }

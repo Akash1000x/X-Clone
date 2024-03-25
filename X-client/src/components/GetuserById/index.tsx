@@ -1,18 +1,24 @@
-import React, { useCallback, useMemo } from "react";
+"use client";
+
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import Image from "next/image";
 
-import XLayout from "@/components/Layout/XLayout";
-import type { GetServerSideProps, NextPage } from "next";
+import XLayout from "@/components/XLayout";
+import type { NextPage } from "next";
 import { GoArrowLeft } from "react-icons/go";
 import FeedCard from "@/components/FeedCard";
 import { Tweet, User } from "@/gql/graphql";
 import { graphqlClient } from "@/clients/api";
-import { getUserByIdQuery } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
-import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
+import {
+  followUserMutation,
+  unfollowUserMutation,
+} from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+
+import Xbanner from "@/../public/x-banner.jpg";
 
 interface ServerProps {
   userInfo?: User;
@@ -21,39 +27,45 @@ interface ServerProps {
 const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user: currentUser } = useCurrentUser();
   const queryClient = useQueryClient();
+  const [followingTheUser, setfollowingTheUser] =
+    React.useState<boolean>(false);
 
-  
-  const amIFollowing = useMemo(() => {
-    if (!props?.userInfo) return false;
-    return (
+  useEffect(() => {
+    if (!props?.userInfo) return;
+    const flag =
       (currentUser?.following?.findIndex(
-        (el) => el?.id === props?.userInfo?.id
-      ) ?? -1) >= 0
-    );
-  }, [props?.userInfo,currentUser?.following]);
+        (el) => el!.id === props?.userInfo?.id
+      ) ?? -1) >= 0;
+    setfollowingTheUser(flag);
+  }, [props?.userInfo, currentUser?.following]);
 
+  const handleFollowUser = useCallback(async () => {
+    if (!props?.userInfo?.id) return;
 
+    await graphqlClient.request(followUserMutation, {
+      to: props?.userInfo?.id,
+    });
+    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+    setfollowingTheUser(true);
+  }, [props?.userInfo?.id, queryClient]);
 
-  const handleFollowUser = useCallback( async ()=>{
-    if(!props?.userInfo?.id) return;
-    
-    await graphqlClient.request(followUserMutation,{to:props?.userInfo?.id});
-    await queryClient.invalidateQueries({queryKey:["current-user"]});
+  const handleUnFollowUser = useCallback(async () => {
+    if (!props?.userInfo?.id) return;
 
-  },[props?.userInfo?.id,queryClient]);
-
-
-  const handleUnFollowUser = useCallback(async ()=> {
-    if(!props?.userInfo?.id) return;
-     
-    await graphqlClient.request(unfollowUserMutation,{to:props?.userInfo?.id});
-  },[props?.userInfo?.id,queryClient])
+    await graphqlClient.request(unfollowUserMutation, {
+      to: props?.userInfo?.id,
+    });
+    setfollowingTheUser(false);
+  }, [props?.userInfo?.id, queryClient]);
 
   return (
     <div>
       <XLayout>
         <div className="flex p-2 gap-5">
-          <Link href={"/"} className=" p-2 hover:bg-zinc-900 cursor-pointer rounded-full w-fit h-fit">
+          <Link
+            href={"/"}
+            className=" p-2 hover:bg-zinc-900 cursor-pointer rounded-full w-fit h-fit"
+          >
             <GoArrowLeft className="text-2xl " />
           </Link>
           <div>
@@ -69,19 +81,19 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           {props?.userInfo?.profileImageURL && (
             <div className="relative">
               <Image
-              className="w-full h-40 "
-              src="https://akash-x-dev.s3.ap-south-1.amazonaws.com/x_default_faults/x_profile_default_banner.png"
-              alt="user-image"
-              width={600}
-              height={50}
-            />
+                className="w-full h-60"
+                src={Xbanner}
+                alt="user-image"
+                width={600}
+                height={60}
+              />
               <Image
-              className="rounded-full absolute top-24 left-7 box-content border-4 border-black"
-              src={props?.userInfo?.profileImageURL}
-              alt="user-image"
-              width={120}
-              height={120}
-            />
+                className="rounded-full absolute -bottom-12 left-7 box-content border-4 border-black"
+                src={props?.userInfo?.profileImageURL}
+                alt="user-image"
+                width={120}
+                height={120}
+              />
             </div>
           )}
           <h1 className="text-xl font-bold mt-20 px-4">
@@ -100,12 +112,18 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             </div>
             {props?.userInfo?.id !== currentUser?.id && (
               <>
-                {amIFollowing ? (
-                  <button onClick={handleUnFollowUser} className="bg-white text-black rounded-full px-4 py-2 border-[1px] font-semibold hover:bg-transparent hover:border-[1px] hover:border-red-800 hover:text-red-700 cursor-pointer transition-all duration-200 ">
+                {followingTheUser ? (
+                  <button
+                    onClick={handleUnFollowUser}
+                    className="bg-white text-black rounded-full px-4 py-2 border-[1px] font-semibold hover:bg-transparent hover:border-[1px] hover:border-red-800 hover:text-red-700 cursor-pointer transition-all duration-200 "
+                  >
                     Unfollow
                   </button>
                 ) : (
-                  <button onClick={handleFollowUser} className="bg-white text-black rounded-full px-4 py-2 font-semibold hover:bg-slate-200 cursor-pointer transition-all duration-200">
+                  <button
+                    onClick={handleFollowUser}
+                    className="bg-white text-black rounded-full px-4 py-2 font-semibold hover:bg-slate-200 cursor-pointer transition-all duration-200"
+                  >
                     Follow
                   </button>
                 )}
@@ -121,22 +139,6 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
       </XLayout>
     </div>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = context.query.id as string | undefined;
-
-  if (!id) return { notFound: true, props: { user: undefined } };
-
-  const userInfo = await graphqlClient.request(getUserByIdQuery, { id });
-
-  if (!userInfo?.getUserById) return { notFound: true };
-
-  return {
-    props: {
-      userInfo: userInfo.getUserById as User,
-    },
-  };
 };
 
 export default UserProfilePage;

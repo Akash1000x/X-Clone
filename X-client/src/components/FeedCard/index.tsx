@@ -36,7 +36,7 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
               {data?.author?.firstName} {data?.author?.lastName}
             </Link>
           </h5>
-          <p className="text-justify opacity-95 font-[chirp-regular] text-sm font-thin">
+          <p className="text-justify opacity-80 font-[chirp-regular] text-sm font-thin tracking-widest py-1">
             {data?.content}
             {data?.imageURL && (
                 <Image

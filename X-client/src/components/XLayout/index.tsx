@@ -1,7 +1,6 @@
+
 import React, { useCallback, useMemo } from "react";
-
 import Image from "next/image";
-
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 import { BsTwitterX } from "react-icons/bs";
@@ -20,6 +19,7 @@ import { graphqlClient } from "@/clients/api";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { User } from "@/gql/graphql";
 
 interface XLayoutProps {
   children: React.ReactNode;
@@ -180,7 +180,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
           {user?.recommendedUser?.length ? (
             <div className="p-3 bg-[#16181C] rounded-lg">
               <h1 className="  text-2xl font-[chirp-heavy]">Who to follow</h1>
-              {user?.recommendedUser?.slice(0, 3).map((e) => (
+              {user?.recommendedUser?.slice(0, 3).map((e:User) => (
                 <Link href={`/${e?.id}`} key={e?.id}>
                   <div
                     

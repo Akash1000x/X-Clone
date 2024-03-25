@@ -1,33 +1,26 @@
-import Image from "next/image";
+"use client";
 
-import { Inter } from "next/font/google";
-
-import FeedCard from "@/components/FeedCard";
-import { useCallback, useState, useEffect } from "react";
-import { useCurrentUser } from "@/hooks/user";
-import { RiImage2Line } from "react-icons/ri";
-import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
-import { Tweet } from "@/gql/graphql";
-import XLayout from "@/components/Layout/XLayout";
-import {
-  GetAllTweetsQuery,
-  getSignedURLForTweetQuery,
-} from "@/graphql/query/tweet";
 import { graphqlClient } from "@/clients/api";
-import { GetServerSideProps } from "next";
+import FeedCard from "@/components/FeedCard";
+import XLayout from "@/components/XLayout";
+import { Tweet } from "@/gql/graphql";
+import { getSignedURLForTweetQuery } from "@/graphql/query/tweets";
+import { useCreateTweet, useGetAllTweets } from "@/hooks/tweets";
+import { useCurrentUser } from "@/hooks/user";
 import axios from "axios";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
-const inter = Inter({ subsets: ["latin"] });
+import { RiImage2Line } from "react-icons/ri";
 
 interface HomeProps {
   tweets?: Tweet[];
 }
 
-export default function Home(props: HomeProps) {
+const Home: React.FC<HomeProps> = (props) => {
   const { user } = useCurrentUser();
-  const { tweets = props.tweets } = useGetAllTweets();
   const { mutate } = useCreateTweet();
+  const { tweets = props.tweets } = useGetAllTweets();
 
   const [content, setContent] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -35,31 +28,29 @@ export default function Home(props: HomeProps) {
   const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
     return async (event: Event) => {
       event.preventDefault();
-      const fileList = input.files;
-      const file: File | null | undefined = fileList?.item(0);
-      
+      const filelist = input.files;
+      const file: File | null | undefined = filelist?.[0];
+
       if (!file) return;
 
       const { getSignedURLForTweet } = await graphqlClient.request(
         getSignedURLForTweetQuery,
         {
-          imageName: file?.name,
-          imageType: file?.type,
+          imageName: file.name,
+          imageType: file.type,
         }
       );
 
-      
       if (getSignedURLForTweet) {
-        toast.loading("Uploading...", { id: "2" });
+        toast.loading("Uploading Image", { id: "2" });
         await axios.put(getSignedURLForTweet, file, {
           headers: {
             "Content-Type": file?.type,
           },
         });
-        toast.success("Upload Completed!", { id: "2" });
-
+        toast.success("Image Uploaded", { id: "2" });
         const url = new URL(getSignedURLForTweet);
-        const myFilePath = `${url.origin}${url.pathname}`;
+        const myFilePath = `${url.origin}/${url.pathname}`;
         setImageURL(myFilePath);
       }
     };
@@ -71,20 +62,15 @@ export default function Home(props: HomeProps) {
     input.accept = "image/*";
 
     const handleFn = handleInputChangeFile(input);
-
     input.addEventListener("change", handleFn);
-
     input.click();
   }, [handleInputChangeFile]);
 
   const handleCreateTweet = useCallback(() => {
-    mutate({
-      content,
-      imageURL,
-    });
+    mutate({ content, imageURL });
     setContent("");
     setImageURL("");
-  }, [content,imageURL]);
+  }, [content, imageURL]);
 
   const rows = content.split("\n").length;
 
@@ -97,7 +83,8 @@ export default function Home(props: HomeProps) {
   }, [content]);
 
   return (
-    <div className="font-[chirp-regular] box-border">
+    // <main className="flex min-h-screen flex-col items-center justify-between">
+    <main className="font-[chirp-regular] box-border">
       <XLayout>
         <div>
           <div className="grid grid-cols-12 border-b-[1px] border-zinc-700 py-3 px-4 hover:bg-neutral-950 transition-all duration-150 ">
@@ -145,18 +132,12 @@ export default function Home(props: HomeProps) {
           </div>
         </div>
         {tweets?.map(
-          (tweet) => tweet && <FeedCard key={tweet?.id} data={tweet as Tweet} />
+          (tweet: Tweet | null) =>
+            tweet && <FeedCard key={tweet?.id} data={tweet as Tweet} />
         )}
       </XLayout>
-    </div>
+    </main>
   );
-}
-
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
-  const allTweets = await graphqlClient.request(GetAllTweetsQuery);
-  return {
-    props: {
-      tweets: allTweets.getAllTweets as Tweet[],
-    },
-  };
 };
+
+export default Home;
