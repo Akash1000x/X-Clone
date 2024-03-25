@@ -180,7 +180,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
           {user?.recommendedUser?.length ? (
             <div className="p-3 bg-[#16181C] rounded-lg">
               <h1 className="  text-2xl font-[chirp-heavy]">Who to follow</h1>
-              {user?.recommendedUser?.slice(0, 3).map((e:User) => (
+              {user?.recommendedUser?.slice(0, 3).map((e) => (
                 <Link href={`/${e?.id}`} key={e?.id}>
                   <div
                     

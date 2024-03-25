@@ -132,7 +132,7 @@ const Home: React.FC<HomeProps> = (props) => {
           </div>
         </div>
         {tweets?.map(
-          (tweet: Tweet | null) =>
+          (tweet) =>
             tweet && <FeedCard key={tweet?.id} data={tweet as Tweet} />
         )}
       </XLayout>
