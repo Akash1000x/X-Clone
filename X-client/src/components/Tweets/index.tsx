@@ -70,7 +70,7 @@ const Home: React.FC<HomeProps> = (props) => {
     mutate({ content, imageURL });
     setContent("");
     setImageURL("");
-  }, [content, imageURL,mutate]);
+  }, [content, imageURL, mutate]);
 
   const rows = content.split("\n").length;
 
@@ -83,8 +83,7 @@ const Home: React.FC<HomeProps> = (props) => {
   }, [content]);
 
   return (
-    // <main className="flex min-h-screen flex-col items-center justify-between">
-    <main className="font-[chirp-regular] box-border">
+    <main className="box-border">
       <XLayout>
         <div>
           <div className="grid grid-cols-12 border-b-[1px] border-zinc-700 py-3 px-4 hover:bg-neutral-950 transition-all duration-150 ">
@@ -123,7 +122,7 @@ const Home: React.FC<HomeProps> = (props) => {
                 />
                 <button
                   onClick={handleCreateTweet}
-                  className="bg-[#1A8CD8] font-[chirp-bold] text-base rounded-full text-center py-[6px] px-4"
+                  className="bg-[#1A8CD8] font-bold text-base rounded-full text-center py-[6px] px-4"
                 >
                   Post
                 </button>
@@ -133,7 +132,13 @@ const Home: React.FC<HomeProps> = (props) => {
         </div>
         {tweets?.map(
           (tweet) =>
-            tweet && <FeedCard key={tweet?.id} data={tweet as Tweet} />
+            tweet && (
+              <FeedCard
+                key={tweet?.id}
+                data={tweet as Tweet}
+                currentUserId={user?.id || ""}
+              />
+            )
         )}
       </XLayout>
     </main>

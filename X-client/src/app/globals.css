@@ -33,17 +33,36 @@ body {
 }
 
 
-@font-face {
-  font-family: chirp-regular;
-  src: url(../../public/Fonts/Chirp-Regular.80fda27a.ttf);
+.heart svg:hover {
+  fill: rgb(190 24 93);
 }
 
-@font-face {
-  font-family: chirp-heavy;
-  src: url(../../public/Fonts/Chirp-Heavy.f44ae4ea.ttf);
-}
+/* .postButtons > div:nth-child(1){
+  background-color: green;
+} */
+.postButtons > div:nth-child(1):hover {
+  background-color: #1982c81a;
+  color: #1981c8;
+  border-radius: 50%;
 
-@font-face {
-  font-family: chirp-bold;
-  src: url(../../public/Fonts/Chirp-Bold.ebb56aba.ttf);
 }
+.postButtons > div:nth-child(2):hover {
+  background-color: #00ba7c1c;
+  color: #00ba7c;
+  border-radius: 50%;
+}
+.postButtons > div:nth-child(4):hover {
+  background-color: #1d9cf01c;
+  color: #1d9bf0;
+  border-radius: 50%;
+}
+.postButtons > div:nth-child(5) > div:hover {
+  background-color: #1d9cf01c;
+  color: #1d9bf0;
+  border-radius: 50%;
+}
+/* .postButtons > div:nth-child(4) span:hover {
+  background-color: #1d9cf01c;
+  color: #1d9bf0;
+  border-radius: 50%;
+} */

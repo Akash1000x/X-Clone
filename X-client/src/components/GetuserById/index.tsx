@@ -31,13 +31,14 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     React.useState<boolean>(false);
 
   useEffect(() => {
+    
     if (!props?.userInfo) return;
     const flag =
       (currentUser?.following?.findIndex(
         (el) => el!.id === props?.userInfo?.id
       ) ?? -1) >= 0;
     setfollowingTheUser(flag);
-  }, [props?.userInfo, currentUser?.following]);
+  }, [props?.userInfo, currentUser?.following, currentUser?.id]);
 
   const handleFollowUser = useCallback(async () => {
     if (!props?.userInfo?.id) return;
@@ -133,7 +134,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
         </div>
         <div>
           {props?.userInfo?.tweets?.map((tweet) => (
-            <FeedCard key={tweet?.id} data={tweet as Tweet} />
+            <FeedCard key={tweet?.id} data={tweet as Tweet} currentUserId={currentUser?.id || ''} />
           ))}
         </div>
       </XLayout>

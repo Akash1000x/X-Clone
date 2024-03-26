@@ -50,6 +50,10 @@ const extraResolvers = {
       return result.map((el) => el.following);
     },
 
+    likes:async (parent:User) =>{
+      return await prismaClient.likes.findMany({where:{authorId:parent.id}})
+    },
+
     recommendedUser: async (parent: User) => {
       const cachedValue = await redisClient.get(
         `RECOMMENDED_USERS:${parent.id}`

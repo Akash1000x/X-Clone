@@ -4,11 +4,12 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import UserService from "../../services/user";
 import TweetService, { CreateTweetPayload } from "../../services/tweet";
+import { prismaClient } from "../../clients/db";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId:`${process.env.AWS_ACCESS_KEY_ID_}`,
+    accessKeyId: `${process.env.AWS_ACCESS_KEY_ID_}`,
     secretAccessKey: `${process.env.AWS_SECRET_ACCESS_KEY_}`,
   },
 });
@@ -58,12 +59,44 @@ const mutations = {
     });
     return tweet;
   },
+
+  likeATweet: async (
+    parent: any,
+    { tweetId }: { tweetId: string },
+    ctx: GraphqlContext
+  ) => {
+    if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
+
+    //check user alerady likes the tweet
+    const check = await prismaClient.likes.findFirst({
+      where: { authorId: ctx.user.id ,tweetId:tweetId},
+    });
+    console.log(check);
+
+    if (check) {
+      console.log("User already likes the tweet");
+
+      await prismaClient.likes.delete({ where: {id:check.id} });
+      return false;
+    }
+
+    await prismaClient.likes.create({
+      data: {
+        tweetId: tweetId,
+        authorId: ctx.user.id,
+      },
+    });
+    return true;
+  },
 };
 
 const extraResolvers = {
   Tweet: {
     author: (parent: Tweet) => {
       return UserService.getUserById(parent.authotId);
+    },
+    likes:async (parent: Tweet) => {
+      return await prismaClient.likes.findMany({ where: { tweetId: parent.id } });
     },
   },
 };

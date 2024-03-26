@@ -12,5 +12,6 @@ export const types = `#graphql
         recommendedUser: [User]
 
         tweets: [Tweet]
+        likes: [Likes]
     }
 `;

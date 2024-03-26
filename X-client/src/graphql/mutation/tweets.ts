@@ -8,3 +8,10 @@ export const createTweetMutation = graphql(`
     }
   }
 `);
+
+export const likeATweetMutation = graphql(`
+  #graphql
+  mutation LikeATweet($tweetId: ID!) {
+    likeATweet(tweetId: $tweetId)
+  }
+`);

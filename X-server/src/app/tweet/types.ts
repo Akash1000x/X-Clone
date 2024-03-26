@@ -11,5 +11,13 @@ export const types = `#graphql
         imageURL: String
 
         author: User
+
+        likes: [Likes]
+    }
+
+    type Likes{
+        id: ID!
+        tweetId:String
+        authorId:String
     }
 `;

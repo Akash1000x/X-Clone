@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo } from "react";
 import Image from "next/image";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
@@ -19,7 +18,6 @@ import { graphqlClient } from "@/clients/api";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { User } from "@/gql/graphql";
 
 interface XLayoutProps {
   children: React.ReactNode;
@@ -98,22 +96,22 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
   );
 
   return (
-    <div>
-      <div className="grid grid-cols-12 h-screen w-screen overflow-y-scroll ">
-        <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-10 lg:ml-12 pl-2 relative flex justify-end">
+    <div className="grid grid-cols-12 h-screen w-screen overflow-y-scroll ">
+      <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-8 lg:ml-12 pl-2 relative flex justify-end ">
+        <div className="fixed h-full">
           <div>
             <Link href={"/"}>
               <div className="text-[28px] hover:bg-zinc-900 cursor-pointer w-fit p-3 mb-1 rounded-full transition-all duration-75">
                 <BsTwitterX />
               </div>
             </Link>
-            <div className="">
+            <div>
               <ul>
                 {SidebarMenuItems.map((item) => (
                   <li key={item.title}>
                     <Link
                       href={item.link}
-                      className="flex font-[chirp-regular]  hover:bg-zinc-900 cursor-pointer w-fit rounded-full  pl-3 pr-3 lg:pr-7 py-3 transition-all duration-75"
+                      className="flex  hover:bg-zinc-900 cursor-pointer w-fit rounded-full  pl-3 pr-3 lg:pr-7 py-3 transition-all duration-75"
                     >
                       <span className="text-3xl lg:pr-4">{item.icon}</span>
                       <span className="text-xl text-gray-200 hidden lg:inline">
@@ -123,7 +121,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
                   </li>
                 ))}
               </ul>
-              <button className="lg:block hidden bg-[#1A8CD8] font-[chirp-bold] text-xl mt-3 w-full rounded-full text-center py-3 ">
+              <button className="lg:block hidden bg-[#1A8CD8] font-bold text-xl mt-3 w-full rounded-full text-center py-3 ">
                 Post
               </button>
               <button className="lg:hidden block bg-[#1A8CD8] mt-3  rounded-full p-3">
@@ -154,59 +152,56 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
                   height={50}
                 />
               )}
-              <div className="font-[chirp-heavy] hidden lg:inline">
+              <div className="hidden lg:inline font-bold">
                 <h3>{user?.firstName}</h3>
                 {/* <h3>{user?.lastName}</h3> */}
               </div>
-              <div className="text-2xl items-end pl-7 hidden lg:inline">
+              <div className="text-2xl items-end pl-7 hidden lg:inline pr-2">
                 <TfiMoreAlt />
               </div>
             </Link>
           )}
         </div>
-        <div className="col-span-10 md:col-span-8 lg:col-span-5 border-l-[1px] border-r-[1px] border-zinc-700 ">
-          {props.children}
-        </div>
-        <div className="col-span-0 md:col-span-3 p-5 ">
-          {!user && (
-            <div className="p-5 bg-zinc-900 rounded-lg">
-              <h1 className="text-xl pb-2 font-[chirp-bold] tracking-wider ">
-                New to X?
-              </h1>
-              <GoogleLogin onSuccess={handleLoginWithGoogle} />
-            </div>
-          )}
+      </div>
+      <div className="col-span-10 md:col-span-8 lg:col-span-5 border-l-[1px] border-r-[1px] border-zinc-700 ">
+        {props.children}
+      </div>
+      <div className="col-span-0 md:col-span-3 p-5 ">
+        {!user && (
+          <div className="p-5 bg-zinc-900 rounded-lg">
+            <h1 className="text-xl pb-2 font-bold tracking-wider ">
+              New to X?
+            </h1>
+            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+          </div>
+        )}
 
-          {user?.recommendedUser?.length ? (
-            <div className="p-3 bg-[#16181C] rounded-lg">
-              <h1 className="  text-2xl font-[chirp-heavy]">Who to follow</h1>
-              {user?.recommendedUser?.slice(0, 3).map((e) => (
-                <Link href={`/${e?.id}`} key={e?.id}>
-                  <div
-                    
-                    className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14"
-                  >
-                    {e?.profileImageURL && (
-                      <Image
-                        className="rounded-full "
-                        src={e?.profileImageURL}
-                        alt="user-image"
-                        width={50}
-                        height={50}
-                      />
-                    )}
-                    <div className="font-[chirp-heavy] ">
-                      <span>{e?.firstName}</span>
-                      <span> {e?.lastName}</span>
-                    </div>
+        {user?.recommendedUser?.length ? (
+          <div className="p-3 bg-[#16181C] rounded-lg">
+            <h1 className="  text-2xl font-bold">Who to follow</h1>
+            {user?.recommendedUser?.slice(0, 3).map((e) => (
+              <Link href={`/${e?.id}`} key={e?.id}>
+                <div className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14">
+                  {e?.profileImageURL && (
+                    <Image
+                      className="rounded-full "
+                      src={e?.profileImageURL}
+                      alt="user-image"
+                      width={50}
+                      height={50}
+                    />
+                  )}
+                  <div className="font-bold ">
+                    <span>{e?.firstName}</span>
+                    <span> {e?.lastName}</span>
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <></>
-          )}
-        </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

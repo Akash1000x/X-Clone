@@ -46,6 +46,11 @@ export const getCurrentUserQuery = graphql(`
           lastName
           profileImageURL
         }
+        likes {
+          id
+          authorId
+          tweetId
+        }
       }
     }
   }
@@ -83,6 +88,11 @@ export const getUserByIdQuery = graphql(`
           firstName
           lastName
           profileImageURL
+        }
+        likes {
+          id
+          authorId
+          tweetId
         }
       }
     }
