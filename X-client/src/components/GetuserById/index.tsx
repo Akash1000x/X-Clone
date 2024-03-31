@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect} from "react";
 
 import Image from "next/image";
 
@@ -15,7 +15,6 @@ import {
   followUserMutation,
   unfollowUserMutation,
 } from "@/graphql/mutation/user";
-import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 
 import Xbanner from "@/../public/x-banner.jpg";
@@ -26,38 +25,6 @@ interface ServerProps {
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user: currentUser } = useCurrentUser();
-  const queryClient = useQueryClient();
-  const [followingTheUser, setfollowingTheUser] =
-    React.useState<boolean>(false);
-
-  useEffect(() => {
-    
-    if (!props?.userInfo) return;
-    const flag =
-      (currentUser?.following?.findIndex(
-        (el) => el!.id === props?.userInfo?.id
-      ) ?? -1) >= 0;
-    setfollowingTheUser(flag);
-  }, [props?.userInfo, currentUser?.following, currentUser?.id]);
-
-  const handleFollowUser = useCallback(async () => {
-    if (!props?.userInfo?.id) return;
-
-    await graphqlClient.request(followUserMutation, {
-      to: props?.userInfo?.id,
-    });
-    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-    setfollowingTheUser(true);
-  }, [props?.userInfo?.id, queryClient]);
-
-  const handleUnFollowUser = useCallback(async () => {
-    if (!props?.userInfo?.id) return;
-
-    await graphqlClient.request(unfollowUserMutation, {
-      to: props?.userInfo?.id,
-    });
-    setfollowingTheUser(false);
-  }, [props?.userInfo?.id]);
 
   return (
     <div>
@@ -111,30 +78,18 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                 <span className="opacity-45 font-thin"> Followers</span>
               </span>
             </div>
-            {props?.userInfo?.id !== currentUser?.id && (
-              <>
-                {followingTheUser ? (
-                  <button
-                    onClick={handleUnFollowUser}
-                    className="bg-white text-black rounded-full px-4 py-2 border-[1px] font-semibold hover:bg-transparent hover:border-[1px] hover:border-red-800 hover:text-red-700 cursor-pointer transition-all duration-200 "
-                  >
-                    Unfollow
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleFollowUser}
-                    className="bg-white text-black rounded-full px-4 py-2 font-semibold hover:bg-slate-200 cursor-pointer transition-all duration-200"
-                  >
-                    Follow
-                  </button>
-                )}
-              </>
-            )}
+
+            <HandleFollowUnFollow props={props} currentUser={currentUser as User} />
+            
           </div>
         </div>
         <div>
           {props?.userInfo?.tweets?.map((tweet) => (
-            <FeedCard key={tweet?.id} data={tweet as Tweet} currentUserId={currentUser?.id || ''} />
+            <FeedCard
+              key={tweet?.id}
+              data={tweet as Tweet}
+              currentUserId={currentUser?.id || ""}
+            />
           ))}
         </div>
       </XLayout>
@@ -142,4 +97,57 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   );
 };
 
+const HandleFollowUnFollow: React.FC<{
+  props: ServerProps;
+  currentUser: User ;
+}> = ({ props, currentUser }) => {
+
+  const [followingTheUser, setfollowingTheUser] =
+    React.useState<boolean>(false);
+
+  useEffect(() => {
+    if (!props?.userInfo) return;
+    const flag =
+      (currentUser?.following?.findIndex(
+        (el) => el!.id === props?.userInfo?.id
+      ) ?? -1) >= 0;
+    setfollowingTheUser(flag);
+  }, [props?.userInfo, currentUser?.following, currentUser?.id]);
+
+
+  const handleFollowUser = useCallback(async () => {
+    if (!props?.userInfo?.id) return;
+
+    await graphqlClient.request(followUserMutation, {
+      to: props?.userInfo?.id,
+    });
+    setfollowingTheUser(true);
+  }, [props?.userInfo?.id]);
+
+
+
+  const handleUnFollowUser = useCallback(async () => {
+    if (!props?.userInfo?.id) return;
+
+    await graphqlClient.request(unfollowUserMutation, {
+      to: props?.userInfo?.id,
+    });
+    setfollowingTheUser(false);
+  }, [props?.userInfo?.id]);
+
+  return (
+    <div>
+      {props?.userInfo?.id !== currentUser?.id && (
+        <>
+            <button
+              onClick={followingTheUser? handleUnFollowUser : handleFollowUser}
+              className={`bg-white text-black rounded-full px-4 py-1 border-[1px] font-semibold ${followingTheUser ? `hover:bg-transparent hover:border-[1px] hover:border-red-800 hover:text-red-700` : `hover:bg-slate-200`}  cursor-pointer transition-all duration-200 `}
+            >
+              {followingTheUser ? "Unfollow" : "Follow"}
+            </button>
+        </>
+      )}
+    </div>
+  );
+};
 export default UserProfilePage;

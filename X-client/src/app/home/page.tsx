@@ -1,5 +1,5 @@
 import { graphqlClient } from "@/clients/api";
-import Tweets from "@/components/Tweets";
+import Tweets from "@/components/HomePage";
 import { Tweet } from "@/gql/graphql";
 import { GetAllTweetsQuery } from "@/graphql/query/tweets";
 
