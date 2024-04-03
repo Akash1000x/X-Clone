@@ -30,31 +30,29 @@ class TweetService {
   }
 
   public static async getAllTweets() {
-    // const cachedtweets = await redisClient.get(`ALL_TWEETS`);
-    // if (cachedtweets) return JSON.parse(cachedtweets);
-
+    const cachedtweets = await redisClient.get(`ALL_TWEETS`);
+    if (cachedtweets) return JSON.parse(cachedtweets);
+    
     const tweets = await prismaClient.tweet.findMany({
       orderBy: { createdAt: "desc" },
     });
-    //caching the result in redis for better performance
-    // await redisClient.set(`ALL_TWEETS`, JSON.stringify(tweets));
+    // caching the result in redis for better performance
+    await redisClient.set(`ALL_TWEETS`, JSON.stringify(tweets));
     return tweets;
   }
 
   public static async getUserTweets(id: string) {
 
-    // const cachedUserTweets = await redisClient.get(`USER_TWEETS:${id}`);
-    // if (cachedUserTweets) return JSON.parse(cachedUserTweets);
+    const cachedUserTweets = await redisClient.get(`USER_TWEETS:${id}`);
+    if (cachedUserTweets) return JSON.parse(cachedUserTweets);
 
     const userTweets =await prismaClient.tweet.findMany({
       where: { author: { id } },
       orderBy: { createdAt: "desc" },
       include:{likes:true}
     });
-    // console.log(userTweets);
-    // console.log(userTweets[0].likes);
     
-    // await redisClient.set(`USER_TWEETS:${id}`, JSON.stringify(userTweets));
+    await redisClient.set(`USER_TWEETS:${id}`, JSON.stringify(userTweets));
     return userTweets;
   }
 }

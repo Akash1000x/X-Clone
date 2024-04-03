@@ -59,7 +59,8 @@ const extraResolvers = {
         `RECOMMENDED_USERS:${parent.id}`
       );
       if (cachedValue) return JSON.parse(cachedValue);
-
+      
+      
       const myFollowings = await prismaClient.follows.findMany({
         where: { followerId: parent.id },
         include: {
@@ -68,8 +69,23 @@ const extraResolvers = {
           },
         },
       });
+      
 
       const recommendedUsers: User[] = [];
+
+      //if the user is not following anyone
+      if (myFollowings.length <= 0) {
+        const users = await prismaClient.user.findMany({
+          orderBy: { createdAt: "asc" },
+        });
+
+        for (const oneUser of users) {
+          if (oneUser.id !== parent.id) {
+            recommendedUsers.push(oneUser);
+          }
+        }
+      }
+
 
       for (const followings of myFollowings) {
         for (const followingOfFollowedUser of followings.following.followers) {
@@ -83,19 +99,7 @@ const extraResolvers = {
         }
       }
 
-      //if the user is not following anyone
-      if (recommendedUsers.length <= 0) {
-        const data = await prismaClient.user.findMany({
-          orderBy: { createdAt: "asc" },
-        });
-
-        for (const followings of myFollowings) {
-          if (followings.followerId !== parent.id) {
-            recommendedUsers.push(followings.following);
-          }
-        }
-      }
-
+      
       await redisClient.set(
         `RECOMMENDED_USERS:${parent.id}`,
         JSON.stringify(recommendedUsers)
