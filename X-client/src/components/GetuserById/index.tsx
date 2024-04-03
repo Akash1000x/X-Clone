@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 
 import Xbanner from "@/../public/x-banner.jpg";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ServerProps {
   userInfo?: User;
@@ -101,6 +102,7 @@ const HandleFollowUnFollow: React.FC<{
   props: ServerProps;
   currentUser: User ;
 }> = ({ props, currentUser }) => {
+  const queryClient = useQueryClient()
 
   const [followingTheUser, setfollowingTheUser] =
     React.useState<boolean>(false);
@@ -122,7 +124,8 @@ const HandleFollowUnFollow: React.FC<{
       to: props?.userInfo?.id,
     });
     setfollowingTheUser(true);
-  }, [props?.userInfo?.id]);
+    await queryClient.invalidateQueries({queryKey:["current-user"]})
+  }, [props?.userInfo?.id, queryClient]);
 
 
 
@@ -133,7 +136,9 @@ const HandleFollowUnFollow: React.FC<{
       to: props?.userInfo?.id,
     });
     setfollowingTheUser(false);
-  }, [props?.userInfo?.id]);
+    await queryClient.invalidateQueries({queryKey:["current-user"]})
+
+  }, [props?.userInfo?.id, queryClient]);
 
   return (
     <div>

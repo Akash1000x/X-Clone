@@ -21,7 +21,7 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
 
   return (
     <div>
-      <div className="grid grid-cols-12 border-b-[1px] border-zinc-700 pt-2 pb-1 px-4 hover:bg-neutral-950 transition-all duration-150 cursor-pointer">
+      <div className="grid grid-cols-12 border-t-[1px] border-zinc-700 pt-2 pb-1 px-4 hover:bg-zinc-950 transition-all duration-150 cursor-pointer">
         <div className="col-span-1 ">
           {data?.author?.profileImageURL && (
             <Link href={`/${data?.author?.id}`}>
@@ -89,7 +89,6 @@ const HandleLikeATweet: React.FC<{ data: Tweet; currentUserId: string }> = ({ da
   const [likesCount, setLikesCount] = useState(data.likes?.length || 0);
 
   const handleLikes = useCallback(async () => {
-    await graphqlClient.request(likeATweetMutation, { tweetId: data?.id });
     if (likeEffect) {
       setlikeEffect(false);
       setLikesCount(likesCount - 1);
@@ -97,6 +96,7 @@ const HandleLikeATweet: React.FC<{ data: Tweet; currentUserId: string }> = ({ da
       setlikeEffect(true);
       setLikesCount(likesCount + 1);
     }
+    await graphqlClient.request(likeATweetMutation, { tweetId: data?.id });
   }, [data?.id, likeEffect, likesCount]);
 
   useEffect(() => {

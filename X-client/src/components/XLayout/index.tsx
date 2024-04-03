@@ -18,6 +18,7 @@ import { graphqlClient } from "@/clients/api";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { User } from "@/gql/graphql";
 
 interface XLayoutProps {
   children: React.ReactNode;
@@ -97,7 +98,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
 
   return (
     <div className="grid grid-cols-12 h-screen w-screen overflow-y-scroll ">
-      <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-8 lg:ml-12 pl-2 relative flex justify-end ">
+      <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-8 lg:ml-10 pl-2 relative flex justify-end ">
         <div className="fixed h-full">
           <div>
             <Link href={"/"}>
@@ -141,7 +142,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
           {user && (
             <Link
               href={`/${user?.id}`}
-              className="absolute bottom-5 flex gap-2 items-center hover:bg-zinc-900 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer"
+              className="absolute bottom-5 flex gap-2 items-center hover:bg-zinc-900 bg-zinc-800 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer transition-all duration-300"
             >
               {user && user.profileImageURL && (
                 <Image
@@ -152,7 +153,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
                   height={50}
                 />
               )}
-              <div className="hidden lg:inline font-bold">
+              <div className="hidden lg:inline font-bold ">
                 <h3>{user?.firstName}</h3>
                 {/* <h3>{user?.lastName}</h3> */}
               </div>
@@ -166,7 +167,7 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
       <div className="col-span-10 md:col-span-8 lg:col-span-5 border-l-[1px] border-r-[1px] border-zinc-700 ">
         {props.children}
       </div>
-      <div className="col-span-0 md:col-span-3 p-5 ">
+      <div className="col-span-0 hidden md:col-span-3 p-5">
         {!user && (
           <div className="p-5 bg-zinc-900 rounded-lg">
             <h1 className="text-xl pb-2 font-bold tracking-wider ">
@@ -176,33 +177,41 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
           </div>
         )}
 
-        {user?.recommendedUser?.length ? (
-          <div className="p-3 bg-[#16181C] rounded-lg">
-            <h1 className="  text-2xl font-bold">Who to follow</h1>
-            {user?.recommendedUser?.slice(0, 3).map((e) => (
-              <Link href={`/${e?.id}`} key={e?.id}>
-                <div className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14">
-                  {e?.profileImageURL && (
-                    <Image
-                      className="rounded-full "
-                      src={e?.profileImageURL}
-                      alt="user-image"
-                      width={50}
-                      height={50}
-                    />
-                  )}
-                  <div className="font-bold ">
-                    <span>{e?.firstName}</span>
-                    <span> {e?.lastName}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <></>
-        )}
+        <RecommendedUser user={user as User} />
       </div>
+    </div>
+  );
+};
+
+const RecommendedUser:React.FC<{user:User}> = ({user}) => {
+  return (
+    <div>
+      {user?.recommendedUser?.length ? (
+        <div className="p-3 bg-[#16181C] rounded-lg">
+          <h1 className="  text-2xl font-bold">Who to follow</h1>
+          {user?.recommendedUser?.slice(0, 3).map((e) => (
+            <Link href={`/${e?.id}`} key={e?.id}>
+              <div className="flex gap-2 items-center hover:bg-gray-800 rounded-full cursor-pointer mt-2 px-3 py-3 min-w-14">
+                {e?.profileImageURL && (
+                  <Image
+                    className="rounded-full "
+                    src={e?.profileImageURL}
+                    alt="user-image"
+                    width={50}
+                    height={50}
+                  />
+                )}
+                <div className="font-bold ">
+                  <span>{e?.firstName}</span>
+                  <span> {e?.lastName}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

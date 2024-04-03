@@ -1,5 +1,5 @@
 import { graphqlClient } from "@/clients/api";
-import Tweets from "@/components/HomePage";
+import HomePage from "@/components/HomePage";
 import { Tweet } from "@/gql/graphql";
 import { GetAllTweetsQuery } from "@/graphql/query/tweets";
 
@@ -17,7 +17,7 @@ export default async function Home() {
 
   return (
     <main>
-      <Tweets {...props} />
+      <HomePage {...props} />
     </main>
   );
 }

@@ -69,7 +69,7 @@ const PostCreate:React.FC<{user:User}> = ({user}) => {
     
   return (
     <div>
-      <div className="grid grid-cols-12 border-b-[1px] border-zinc-700 py-3 px-4 hover:bg-neutral-950 transition-all duration-150 ">
+      <div className="grid grid-cols-12 py-3 px-4 hover:bg-neutral-950 transition-all duration-150 ">
         <div className="col-span-1 ">
           {user?.profileImageURL && (
             <Image
