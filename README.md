@@ -28,7 +28,7 @@
     ```bash
       yarn
      ```
-3. Add a PostgreSQL database URL to the Backend's .env file.
+3. Add PostgreSQL database URL and JWT secret to the Backend's .env file.
   
 5. Generate Prisma Client by running the following commands on the Backend::
     ```bash
