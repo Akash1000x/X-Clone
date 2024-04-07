@@ -24,15 +24,15 @@ class TweetService {
       },
     });
     // await redisClient.setex(`RATE_LIMIT:TWEET:${payload.authorId}`, 10, 1);
-    // await redisClient.del(`ALL_TWEETS`);
-    // await redisClient.del(`USER_TWEETS:${payload.authorId}`);
+    await redisClient.del(`ALL_TWEETS`);
+    await redisClient.del(`USER_TWEETS:${payload.authorId}`);
     return tweet;
   }
 
   public static async getAllTweets() {
     const cachedtweets = await redisClient.get(`ALL_TWEETS`);
     if (cachedtweets) return JSON.parse(cachedtweets);
-    
+
     const tweets = await prismaClient.tweet.findMany({
       orderBy: { createdAt: "desc" },
     });
@@ -42,16 +42,15 @@ class TweetService {
   }
 
   public static async getUserTweets(id: string) {
-
     const cachedUserTweets = await redisClient.get(`USER_TWEETS:${id}`);
     if (cachedUserTweets) return JSON.parse(cachedUserTweets);
 
-    const userTweets =await prismaClient.tweet.findMany({
+    const userTweets = await prismaClient.tweet.findMany({
       where: { author: { id } },
       orderBy: { createdAt: "desc" },
-      include:{likes:true}
+      include: { likes: true },
     });
-    
+
     await redisClient.set(`USER_TWEETS:${id}`, JSON.stringify(userTweets));
     return userTweets;
   }

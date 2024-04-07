@@ -41,7 +41,7 @@ const PostCreate:React.FC<{user:User}> = ({user}) => {
             });
             toast.success("Image Uploaded", { id: "2" });
             const url = new URL(getSignedURLForTweet);
-            const myFilePath = `${url.origin}/${url.pathname}`;
+            const myFilePath = `${url.origin}${url.pathname}`;
             setImageURL(myFilePath);
           }
         };

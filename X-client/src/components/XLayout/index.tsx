@@ -19,6 +19,7 @@ import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { User } from "@/gql/graphql";
+import { MdLogout } from "react-icons/md";
 
 interface XLayoutProps {
   children: React.ReactNode;
@@ -96,10 +97,19 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
     [queryClient]
   );
 
+  const handleLogOut = useCallback(
+    (e: any) => {
+      e.preventDefault();
+      window.localStorage.removeItem("_X_token");
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
+    },
+    [queryClient]
+  );
+
   return (
     <div className="grid grid-cols-12 h-screen w-screen overflow-y-scroll ">
       <div className="col-span-2 lg:col-span-3 pt-1 h-screen pr-2 lg:pr-8 lg:ml-10 pl-2 relative flex justify-end ">
-        <div className="fixed h-full">
+        <div className="fixed h-screen flex flex-col justify-between   pb-2">
           <div>
             <Link href={"/"}>
               <div className="text-[28px] hover:bg-zinc-900 cursor-pointer w-fit p-3 mb-1 rounded-full transition-all duration-75">
@@ -139,42 +149,70 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
               </button>
             </div>
           </div>
-          {user && (
-            <Link
-              href={`/${user?.id}`}
-              className="absolute bottom-5 flex gap-2 items-center hover:bg-zinc-900 bg-zinc-800 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer transition-all duration-300"
-            >
-              {user && user.profileImageURL && (
-                <Image
-                  className="rounded-full "
-                  src={user.profileImageURL}
-                  alt="user-image"
-                  width={50}
-                  height={50}
+          <div className="pb-2">
+            {user ? (
+              <div>
+                <Link
+                  href={`/${user?.id}`}
+                  className=" flex gap-2 items-center hover:bg-zinc-900 bg-zinc-800 lg:py-2 lg:pl-2 lg:pr-4 rounded-full cursor-pointer transition-all duration-300"
+                >
+                  {user && user.profileImageURL && (
+                    <Image
+                      className="rounded-full "
+                      src={user.profileImageURL}
+                      alt="user-image"
+                      width={50}
+                      height={50}
+                    />
+                  )}
+                  <div className="hidden lg:inline font-bold ">
+                    <h3>{user?.firstName}</h3>
+                    {/* <h3>{user?.lastName}</h3> */}
+                  </div>
+                  <div className="text-2xl items-end pl-7 hidden lg:inline pr-2">
+                    <TfiMoreAlt />
+                  </div>
+                </Link>
+                <div
+                  onClick={handleLogOut}
+                  className="lg:hidden inline-block text-[28px] hover:bg-zinc-800 bg-zinc-900 cursor-pointer w-fit p-3 mt-1 rounded-full transition-all duration-75"
+                >
+                  <MdLogout />
+                </div>
+              </div>
+            ) : (
+              <div className="w-fit inline-block lg:hidden">
+                <GoogleLogin
+                  onSuccess={handleLoginWithGoogle}
+                  theme="filled_black"
+                  type="icon"
                 />
-              )}
-              <div className="hidden lg:inline font-bold ">
-                <h3>{user?.firstName}</h3>
-                {/* <h3>{user?.lastName}</h3> */}
               </div>
-              <div className="text-2xl items-end pl-7 hidden lg:inline pr-2">
-                <TfiMoreAlt />
-              </div>
-            </Link>
-          )}
+            )}
+          </div>
         </div>
       </div>
       <div className="col-span-10 md:col-span-8 lg:col-span-5 border-l-[1px] border-r-[1px] border-zinc-700 ">
         {props.children}
       </div>
-      <div className="col-span-0 hidden md:col-span-3 p-5">
-        {!user && (
-          <div className="p-5 bg-zinc-900 rounded-lg">
-            <h1 className="text-xl pb-2 font-bold tracking-wider ">
-              New to X?
-            </h1>
-            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+      <div className="col-span-0  md:col-span-3 p-5 flex flex-col">
+        {!user ? (
+          <div className="p-5 bg-zinc-900 rounded-lg w-fit hidden lg:inline-block">
+            <GoogleLogin
+              onSuccess={handleLoginWithGoogle}
+              theme="filled_black"
+              size="large"
+              width={"100px"}
+              text="signin_with"
+            />
           </div>
+        ) : (
+          <button
+            className="hidden lg:inline-block p-5 hover:bg-zinc-900 bg-zinc-800  font-bold text-xl w-fit px-3 rounded-lg text-center py-2"
+            onClick={handleLogOut}
+          >
+            Log out
+          </button>
         )}
 
         <RecommendedUser user={user as User} />
@@ -183,11 +221,11 @@ const XLayout: React.FC<XLayoutProps> = (props) => {
   );
 };
 
-const RecommendedUser:React.FC<{user:User}> = ({user}) => {
+const RecommendedUser: React.FC<{ user: User }> = ({ user }) => {
   return (
-    <div>
+    <div className="hidden lg:inline-block">
       {user?.recommendedUser?.length ? (
-        <div className="p-3 bg-[#16181C] rounded-lg">
+        <div className="p-3 bg-[#16181C] rounded-lg mt-2">
           <h1 className="  text-2xl font-bold">Who to follow</h1>
           {user?.recommendedUser?.slice(0, 3).map((e) => (
             <Link href={`/${e?.id}`} key={e?.id}>
